@@ -1,5 +1,6 @@
 from os import error
-import pandas as pd
+import os
+from os.path import isdir
 import pyaudio as audio
 import speech_recognition as sr
 import pyttsx3
@@ -9,6 +10,8 @@ import wikipedia
 from urllib.request import urlopen
 import re
 import smtplib
+import pathlib
+import numpy as np
 
 engine = pyttsx3.init('sapi5')
 voices = engine.getProperty('voices')
@@ -85,7 +88,9 @@ def do_something():
             
         elif 'play' in res:
             play_tag = res.split('play')[1].lstrip()
+            play_tag = play_tag.replace(" ", "+")
             youtube_search_URL = 'https://www.youtube.com/results?search_query=' + play_tag
+            print(youtube_search_URL)
             html = urlopen(youtube_search_URL)
             video_ids = re.findall(r'watch\?v=(\S{11})', html.read().decode())
             video_song_url = 'https://www.youtube.com/watch?v='+ video_ids[0]
@@ -106,6 +111,16 @@ def do_something():
         
         elif 'exit' in res:
             return
+
+        elif 'time' in res:
+            speak(datetime.now().strftime('%I%M%p'))
+
+        elif 'pictures' in res:
+            # picture_dir = 'C:\\Users\\Shubham\\Pictures'
+            picture_dir = os.path.join(pathlib.Path.home(), 'Saved Pictures')
+            list_of_pics = os.listdir(picture_dir)
+            # [os.startfile(os.path.join(picture_dir, k)) for k in list_of_pics if not os.path.isdir(os.path.join(picture_dir, k))]
+            os.startfile(os.path.join(picture_dir, list_of_pics[np.random.randint(0,len(list_of_pics)-1)]))
 
         else:
             speak("Did you say that correctly? Let's try again.")
